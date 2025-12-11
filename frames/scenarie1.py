@@ -64,6 +64,7 @@ class Scenarie1(ScenarieFrame): # nedarver fra scenarie_base
             messagebox.showerror("Error", "Invalid udbytte format.")
             return None, None
 
+    # metode til at plot matrix
     def plot_matrices(self):
         P1, P2 = self.read_matrix()
         if P1 is None: return
@@ -72,15 +73,24 @@ class Scenarie1(ScenarieFrame): # nedarver fra scenarie_base
         ax1 = self.plotFrame.fig.add_subplot(1,2,1)
         ax2 = self.plotFrame.fig.add_subplot(1,2,2)
 
+        # vis farverne
         ax1.imshow(P1, cmap="viridis")
         ax2.imshow(P2, cmap="plasma")
 
+        # Vis udbytte som tekst i hver celle
+        for i in range(P1.shape[0]):
+            for j in range(P1.shape[1]):
+                ax1.text(j, i, f"{P1[i, j]:.1f}", ha="center", va="center", color ="black")
+                ax2.text(j, i, f"{P2[i, j]:.1f}", ha="center", va="center", color ="black")
+
+        # sæt titlerne
         ax1.set_title("P1 udbytte")
         ax2.set_title("P2 udbytte")
 
         self.plotFrame.fig.tight_layout()
         self.plotFrame.draw()
 
+    # metode til at plot elimation
     def plot_elimination(self):
         P1, P2 = self.read_matrix()
         if P1 is None: return
@@ -96,9 +106,17 @@ class Scenarie1(ScenarieFrame): # nedarver fra scenarie_base
         ax1 = self.plotFrame.fig.add_subplot(1,2,1)
         ax2 = self.plotFrame.fig.add_subplot(1,2,2)
 
+        # viser farverne
         ax1.imshow(P1core, cmap="viridis")
         ax2.imshow(P2core, cmap="plasma")
 
+        # viser tekst i cellerne
+        for i in range(P1core.shape[0]):
+            for j in range(P1core.shape[1]):
+                ax1.text(j, i, f"{P1core[i, j]:.1f}", ha="center", va="center", color="black")
+                ax2.text(j, i, f"{P2core[i, j]:.1f}", ha="center", va="center", color="black")
+
+        # skriver teksten
         ax1.set_title("Efter elimination (P1)")
         ax2.set_title("Efter elimination (P2)")
 
