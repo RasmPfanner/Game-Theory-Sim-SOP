@@ -21,5 +21,5 @@ class ScenarieFrame(ttk.Frame):
         # tilbageknap
         nav = ttk.Frame(self)
         nav.pack(fill="x", padx=8, pady=6)
-        back = ttk.Button(nav, text="Back", command=lambda: controller.show_frame("MainMenu)")) # selve knappen
+        back = ttk.Button(nav, text="Back", command=lambda: controller.show_frame("MainMenu")) # selve knappen
         back.pack(side="right")

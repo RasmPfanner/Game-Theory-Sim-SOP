@@ -17,7 +17,7 @@ class MainMenu(ttk.Frame): #opretter MainMenu som en frame
 
         # Knapper der tager hen til forskellige simulationsscenarier
         ttk.Button(btns, text="Iterated Elimination", width=24,
-                   command=lambda: controller.show_frame("Scenario1")).grid(row=0, column=0, pady=4)
+                   command=lambda: controller.show_frame("Scenarie1")).grid(row=0, column=0, pady=4)
 
         ttk.Button(btns, text="Mixed NE Sensitivity", width=24,
                    command=lambda: controller.show_frame("Scenario2")).grid(row=1, column=0, pady=4)
