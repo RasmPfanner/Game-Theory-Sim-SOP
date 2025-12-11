@@ -8,7 +8,7 @@ class ScenarieFrame(ttk.Frame):
         super().__init__(parent)
         self.controller = controller
 
-        header = ttk.Label(Self, text=title, font=("TkDefaultFont", 14, "bold"))
+        header = ttk.Label(self, text=title, font=("TkDefaultFont", 14, "bold"))
         header.pack(pady=6)
 
         self.body = ttk.Frame(self)

@@ -29,9 +29,9 @@ class SpilteoriSim(tk.Tk):
 
         self.show_frame("MainMenu")
 
-def show_frame(self, name):
-    frame = self.frames[name]
-    frame.tkraise()
+    def show_frame(self, name):
+        frame = self.frames[name]
+        frame.tkraise()
 
 if __name__ == "__main__":
     app = SpilteoriSim()

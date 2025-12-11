@@ -1,5 +1,6 @@
 import numpy as np
-from  tkinter import ttk, messagebox, BooleanVar # kan vise beskeder
+import tkinter as tk
+from  tkinter import ttk, messagebox # kan vise beskeder
 from frames.scenarie_base import ScenarieFrame # importer template
 
 class Scenarie1(ScenarieFrame): # nedarver fra scenarie_base
@@ -25,7 +26,7 @@ class Scenarie1(ScenarieFrame): # nedarver fra scenarie_base
         # yderligere række for weakly dominated rækkke
         extra = ttk.Frame(frame)
         extra.pack(anchor="w", pady=4)
-        self.extra_var = BooleanVar(value=False)
+        self.extra_var = tk.BooleanVar(value=False)
         ttk.Checkbutton(extra, text="Inkluder extra række",
                         variable=self.extra_var).pack(side="left")
 
