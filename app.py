@@ -5,6 +5,7 @@ from tkinter import ttk
 # importer fra de andre klasser
 from frames.main_menu import MainMenu
 from frames.scenarie1 import Scenarie1
+from frames.scenarie2 import Scenarie2
 
 class SpilteoriSim(tk.Tk):
     def __init__(self):
@@ -20,9 +21,9 @@ class SpilteoriSim(tk.Tk):
         self.frames = {}
         for F, name in [
             (MainMenu, "MainMenu"),
-            (Scenarie1, "Scenarie1")
+            (Scenarie1, "Scenarie1"),
+            (Scenarie2, "Scenarie2")
         ]:
-
             frame = F(container, self)
             self.frames[name] = frame
             frame.grid(row=0, column=0, sticky="nsew")

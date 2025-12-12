@@ -4,12 +4,22 @@ from tkinter import ttk, messagebox
 from frames.scenarie_base import ScenarieFrame
 
 class Scenarie1(ScenarieFrame):
+
+    '''
+    Scenarie 1: Iterated Elimation of Dominated Strategies IESDS/IEWDS
+
+    Her kan spillere
+    - Opstille en 2x2, og 3x2 matrix
+    - visualisere den originale udbytte-matrix
+    - visualisere matrixen efter elimation er fundet sted.
+    '''
     def __init__(self, parent, controller):
         super().__init__(parent, controller, "Iterated Elimination")
 
         frame = self.body
         ttk.Label(frame, text="Skriv 2x2 udbytte (format: 'P1 P2')").pack(anchor="w")
 
+        # Grid af celler som matrixen sidder i
         grid = ttk.Frame(frame)
         grid.pack(anchor="w", pady=5)
 
@@ -23,29 +33,42 @@ class Scenarie1(ScenarieFrame):
                 row.append(e)
             self.entries.append(row)
 
+        # den ekstra række der kan tlføjse
         extra = ttk.Frame(frame)
         extra.pack(anchor="w", pady=4)
         self.extra_var = tk.BooleanVar(value=False)
         ttk.Checkbutton(extra, text="Inkluder extra række",
                         variable=self.extra_var).pack(side="left")
 
+        # tilhørende kolonner til den ekstra række
         self.extra_entries = [ttk.Entry(frame, width=12), ttk.Entry(frame, width=12)]
         self.extra_entries[0].insert(0, "0 0")
         self.extra_entries[1].insert(0, "0 0")
         self.extra_entries[0].pack(anchor="w")
         self.extra_entries[1].pack(anchor="w")
 
+        # knapper til plotting
         btns = ttk.Frame(frame)
         btns.pack(pady=5)
 
         ttk.Button(btns, text="Plot udbyttematrix", command=self.plot_matrices).pack(side="left", padx=4)
         ttk.Button(btns, text="Plot efter elimination", command=self.plot_elimination).pack(side="left", padx=4)
 
+
+    # læser payoff matrix fra inputfields
     def read_matrix(self):
+        '''
+        Læser payoff fra inputfelterne i GUI, og konstruere
+        to udbyttematricer P1 og P2.
+        Returner P1, P2, eller None, None hvis formattering er forkert
+        '''
+
         try:
+            # start med 2x2 matrix fra inputfelterne
             P1 = np.zeros((2,2))
             P2 = np.zeros((2,2))
 
+            # læs input fra felterne
             for i in range(2):
                 for j in range(2):
                     p = self.entries[i][j].get().split()
@@ -54,6 +77,7 @@ class Scenarie1(ScenarieFrame):
                     P1[i,j] = float(p[0])
                     P2[i,j] = float(p[1])
 
+            # læser også hvis der er en trædje kolonne
             if self.extra_var.get():
                 e0 = self.extra_entries[0].get().split()
                 e1 = self.extra_entries[1].get().split()
@@ -68,6 +92,8 @@ class Scenarie1(ScenarieFrame):
             messagebox.showerror("Error", f"Invalid udbytte format: {ex}")
             return None, None
 
+
+    # Funktion der plotter matricerne
     def plot_matrices(self):
         P1, P2 = self.read_matrix()
         if P1 is None:
@@ -80,29 +106,33 @@ class Scenarie1(ScenarieFrame):
         ax1.imshow(P1, cmap="viridis")
         ax2.imshow(P2, cmap="plasma")
 
+        # laver teksten i hver celle med dens udbytte
         for i in range(P1.shape[0]):
             for j in range(P1.shape[1]):
                 ax1.text(j, i, f"{P1[i, j]:.1f}", ha="center", va="center", color="black")
                 ax2.text(j, i, f"{P2[i, j]:.1f}", ha="center", va="center", color="black")
 
+        # laver titlerne til de to matricer
         ax1.set_title("P1 udbytte")
         ax2.set_title("P2 udbytte")
 
         self.plotFrame.fig.tight_layout()
         self.plotFrame.draw()
 
+    # plot matricer efter IESDS/IEWDS
     def plot_elimination(self):
         P1, P2 = self.read_matrix()
         if P1 is None:
             return
 
-        # Run iterated elimination
+        # Kør iterated elimination
         P1e, P2e = self.eliminate_dominated(P1.copy(), P2.copy())
 
-        # If nothing removed, inform user
+        # Sig til brugeren hvis der ingen dominerede strategier var
         if P1e.shape == P1.shape and P2e.shape == P2.shape:
             messagebox.showinfo("Info", "Ingen strategier blev elimineret ved itereret dominans.")
-        # Plot the reduced matrices (even if unchanged)
+
+        # Plot matricerne
         self.plotFrame.clear()
         ax1 = self.plotFrame.fig.add_subplot(1,2,1)
         ax2 = self.plotFrame.fig.add_subplot(1,2,2)
@@ -110,6 +140,7 @@ class Scenarie1(ScenarieFrame):
         ax1.imshow(P1e, cmap="viridis")
         ax2.imshow(P2e, cmap="plasma")
 
+        # tegn udbytte i matricerne
         for i in range(P1e.shape[0]):
             for j in range(P1e.shape[1]):
                 ax1.text(j, i, f"{P1e[i, j]:.1f}", ha="center", va="center", color="black")
@@ -121,55 +152,77 @@ class Scenarie1(ScenarieFrame):
         self.plotFrame.fig.tight_layout()
         self.plotFrame.draw()
 
-    def eliminate_dominated(self, P1, P2):
+    def eliminate_dominated(self, P1, P2, mode="strict"):
         """
-        Iterated elimination of (weakly) dominated strategies.
-        We remove strictly-or-weakly dominated rows for P1 and columns for P2.
-        A row i is dominated by row k if P1[k, j] >= P1[i, j] for all j and >
-        for at least one j. Similar for columns (compare column vectors of P2).
+        Perform iterated elimination of dominated strategies.
+        P1: payoff matrix for Player 1 (rows = P1 strategies, columns = P2 strategies)
+        P2: payoff matrix for Player 2 (same size as P1)
+        mode: "strict" or "weak"
         """
+
+        def row_dominated(i, k, P):
+            """
+            Is row i dominated by row k in matrix P?
+            """
+            row_i = P[i, :]
+            row_k = P[k, :]
+
+            ge = np.all(row_k >= row_i)
+            gt = np.any(row_k > row_i)
+
+            if mode == "strict":
+                return ge and gt
+            else:  # weak
+                return ge and gt  # (same logic, but IEWDS may eliminate more through iteration)
+
+        def col_dominated(j, l, P):
+            """
+            Is column j dominated by column l in matrix P?
+            """
+            col_j = P[:, j]
+            col_l = P[:, l]
+
+            ge = np.all(col_l >= col_j)
+            gt = np.any(col_l > col_j)
+
+            if mode == "strict":
+                return ge and gt
+            else:  # weak
+                return ge and gt
+
         changed = True
-        # We'll loop until no deletions occur
         while changed:
             changed = False
-
             rows_to_delete = set()
             cols_to_delete = set()
 
-            # Check dominated rows for Player 1
+            # --- Check Player 1 dominated rows (use P1) ---
             n_rows = P1.shape[0]
             for i in range(n_rows):
                 for k in range(n_rows):
                     if i == k:
                         continue
-                    # row k dominates row i?
-                    ge = np.all(P1[k, :] >= P1[i, :])   # >= for all columns
-                    gt = np.any(P1[k, :] > P1[i, :])    # strictly greater for at least one
-                    if ge and gt:
+                    if row_dominated(i, k, P1):
                         rows_to_delete.add(i)
-                        break  # no need to check other k's for this i
+                        break
 
-            # Check dominated columns for Player 2
+            # --- Check Player 2 dominated columns (use P2) ---
             n_cols = P2.shape[1]
             for j in range(n_cols):
                 for l in range(n_cols):
                     if j == l:
                         continue
-                    # column l dominates column j?
-                    ge = np.all(P2[:, l] >= P2[:, j])  # >= for all rows
-                    gt = np.any(P2[:, l] > P2[:, j])   # strictly greater for >= one
-                    if ge and gt:
+                    if col_dominated(j, l, P2):
                         cols_to_delete.add(j)
                         break
 
-            # If there are deletions, apply them (delete rows first then columns).
-            # Use sorted lists to have deterministic behavior.
+            # --- Delete rows first ---
             if rows_to_delete:
-                # np.delete accepts list of indices
                 P1 = np.delete(P1, sorted(rows_to_delete), axis=0)
                 P2 = np.delete(P2, sorted(rows_to_delete), axis=0)
                 changed = True
 
+            # --- Then delete columns ---
             if cols_to_delete:
                 P1 = np.delete(P1, sorted(cols_to_delete), axis=1)
                 P2 = np.delete(P2, sorted(cols_to_delete), axis=1)
