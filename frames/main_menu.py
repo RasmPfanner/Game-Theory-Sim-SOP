@@ -1,6 +1,6 @@
 from tkinter import ttk
 
-class MainMenu(ttk.Frame): #opretter MainMenu som en frame
+class MainMenu(ttk.Frame): # opretter MainMenu som en frame
     def __init__(self, parent, controller): #
         super().__init__(parent)
         self.controller = controller
@@ -15,7 +15,7 @@ class MainMenu(ttk.Frame): #opretter MainMenu som en frame
         btns = ttk.Frame(self)
         btns.pack()
 
-        # Knapper der tager hen til forskellige simulationsscenarier
+        # Knapper der skifter frame til forskellige simulationsscenarier
         ttk.Button(btns, text="Iterated Elimination", width=24,
                    command=lambda: controller.show_frame("Scenarie1")).grid(row=0, column=0, pady=4)
 

@@ -1,2 +1,4 @@
 # Game-Theory-Sim-SOP
-This time in Python, it's easier for me to do.
+
+Programmet giver ikke så meget mening hvis man ikke også har læst min SOP til den.
+
