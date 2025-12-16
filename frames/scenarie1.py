@@ -268,8 +268,7 @@ class Scenarie1(ScenarieFrame):
             for k in range(P1.shape[0]):
                 if i == k:
                     continue
-                if (np.all(P1[k] >= P1[i]) and
-                        np.any(P1[k] > P1[i])):
+                if  np.any(P1[k] > P1[i]):
                     return ("row", i)
 
         # Tjek Player 2's kolonner
@@ -279,8 +278,7 @@ class Scenarie1(ScenarieFrame):
                     continue
                 col_j = P2[:, j]
                 col_l = P2[:, l]
-                if (np.all(col_l >= col_j) and
-                        np.any(col_l > col_j)):
+                if  np.any(col_l > col_j):
                     return ("col", j)
 
         return None
