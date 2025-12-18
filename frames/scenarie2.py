@@ -10,9 +10,11 @@ class Scenarie2(ScenarieFrame):
 
         frame = self.body
 
+        # tekst over inputfelter
         ttk.Label(frame, text="Enter Player 1 payoffs (a,b,c,d):").pack(anchor="w")
         row = ttk.Frame(frame); row.pack()
 
+        # inputfelter
         self.a = ttk.Entry(row, width=8); self.a.insert(0,"3")
         self.b = ttk.Entry(row, width=8); self.b.insert(0,"1")
         self.c = ttk.Entry(row, width=8); self.c.insert(0,"0")
@@ -23,6 +25,7 @@ class Scenarie2(ScenarieFrame):
         self.c.pack(side="left", padx=3)
         self.d.pack(side="left", padx=3)
 
+        # tekst og dropdown menu
         ttk.Label(frame, text="Sweep payoff:").pack(anchor="w", pady=(8,0))
         self.sweep_var = tk.StringVar(value="b")
         ttk.Combobox(frame, values=["a","b","c","d"], textvariable=self.sweep_var,
@@ -38,10 +41,13 @@ class Scenarie2(ScenarieFrame):
         self.tmax.pack(side="left", padx=2)
         self.tsteps.pack(side="left", padx=2)
 
+        # knap der kører plot_curve metode
         ttk.Button(frame, text="Plot p*(q*) vs parameter",
                    command=self.plot_curve).pack(pady=6)
 
+    # metode til at vise den varierede parameter
     def plot_curve(self):
+        # henter de forskellige parametrer og grafintervallet
         try:
             a = float(self.a.get())
             b = float(self.b.get())
@@ -55,10 +61,12 @@ class Scenarie2(ScenarieFrame):
             messagebox.showerror("Error", ex)
             return
 
+        # array der holder alle punkterne
         ts = np.linspace(tmin, tmax, steps)
         p_vals = np.full_like(ts, np.nan)
         q_vals = np.full_like(ts, np.nan)
 
+        # laver lokale kopier af parametrerne. Sammenligner disse med den valgte parameter
         for i, t in enumerate(ts):
             aa, bb, cc, dd = a,b,c,d
             if key == "a": aa = t
@@ -66,9 +74,11 @@ class Scenarie2(ScenarieFrame):
             elif key == "c": cc = t
             elif key == "d": dd = t
 
+            # nævner i funktionen
             denom_p = aa - bb - cc + dd
             denom_q = aa - cc - bb + dd
 
+            # funktionsforskrifterne
             p_vals[i] = (dd - bb) / denom_p if denom_p != 0 else np.nan
             q_vals[i] = (dd - cc) / denom_q if denom_q != 0 else np.nan
 
